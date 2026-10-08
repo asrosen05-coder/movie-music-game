@@ -1,0 +1,11 @@
+{
+  "name": "movie-music-game",
+  "private": true,
+  "description": "Name That Movie: hear a song, pick the movie it was in. Static site, no build step.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\"",
+    "serve": "python -m http.server 8765",
+    "check-urls": "node tools/check-urls.mjs"
+  }
+}

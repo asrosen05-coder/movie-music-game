@@ -1,0 +1,4 @@
+tools/cache/itunes-responses.json
+tools/cache/wiki-pages.json
+tools/cache-*.log
+node_modules/

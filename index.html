@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Hear a 30-second clip of a song. Guess the movie it was in.">
+<link rel="preconnect" href="https://audio-ssl.itunes.apple.com">
+<link rel="preconnect" href="https://is1-ssl.mzstatic.com">
+<title>Name That Movie</title>
+<link rel="stylesheet" href="css/styles.css?v=1">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-xmark" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-forward" viewBox="0 0 24 24"><path d="M4 6.5v11l7.5-5.5zM12.5 6.5v11L20 12z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.25" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="7.9" r="1.25" fill="currentColor"/><path d="M12 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 3.5v4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 10.5H7a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6.5a2 2 0 0 0-2-2h-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></symbol>
+  <symbol id="i-notes" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z" fill="currentColor"/></symbol>
+</svg>
+
+<main id="app">
+
+  <!-- START -->
+  <section id="screen-start" class="screen is-active" aria-labelledby="start-title">
+    <div class="screen-scroll start">
+      <div class="artwork" aria-hidden="true">
+        <div class="wave wave-lg"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <p class="eyebrow">Movie Soundtrack Quiz</p>
+      <h1 id="start-title" class="large-title">Name That Movie</h1>
+      <p class="lede">Hear a song from a movie. Pick the movie it was in.</p>
+
+      <ul class="grouped rules">
+        <li>
+          <span class="glyph glyph-indigo"><svg><use href="#i-notes"/></svg></span>
+          <div><strong>10 songs</strong><span>Drawn at random every game</span></div>
+        </li>
+        <li>
+          <span class="glyph glyph-orange"><svg><use href="#i-bolt"/></svg></span>
+          <div><strong>Faster scores higher</strong><span>Up to 1,000 points a song. No time limit.</span></div>
+        </li>
+        <li>
+          <span class="glyph glyph-teal"><svg><use href="#i-eye"/></svg></span>
+          <div><strong>One song reveal</strong><span>See the title and artist when you're stuck</span></div>
+        </li>
+        <li>
+          <span class="glyph glyph-gray"><svg><use href="#i-forward"/></svg></span>
+          <div><strong>One skip</strong><span>Save it for the one you can't place</span></div>
+        </li>
+      </ul>
+    </div>
+    <footer class="dock">
+      <button id="btn-play" class="btn btn-filled btn-large" type="button" disabled>Play</button>
+      <p id="load-status" class="footnote" role="status">Loading songs…</p>
+    </footer>
+  </section>
+
+  <!-- QUESTION -->
+  <section id="screen-question" class="screen" aria-label="Question">
+    <header class="nav">
+      <button id="btn-quit" class="icon-btn" type="button" aria-label="End quiz">
+        <svg><use href="#i-xmark"/></svg>
+      </button>
+      <div id="progress" class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1"></div>
+      <p class="score" aria-label="Score"><span id="score-value" data-value="0">0</span></p>
+    </header>
+
+    <div id="now-playing" class="now-playing" data-state="loading">
+      <div class="np-ambient" aria-hidden="true"><img id="np-artwork" alt=""></div>
+      <div class="np-sheen" aria-hidden="true"></div>
+      <div class="np-content">
+        <p id="np-kicker" class="np-kicker">Song 1 of 10</p>
+        <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div id="np-reveal" class="np-reveal" hidden>
+          <p id="np-reveal-title" class="np-reveal-title"></p>
+          <p id="np-reveal-artist" class="np-reveal-artist"></p>
+        </div>
+        <p id="np-status" class="np-status" role="status">Loading…</p>
+        <div class="np-footer">
+          <p class="np-points"><span id="np-points">1,000</span><small> pts available</small></p>
+          <button id="btn-replay" class="chip" type="button" hidden>
+            <svg><use href="#i-replay"/></svg>Replay
+          </button>
+        </div>
+      </div>
+      <div class="np-progress" aria-hidden="true"><span id="np-progress-fill"></span></div>
+    </div>
+
+    <h2 class="section-label" id="options-label">Which movie?</h2>
+    <div id="options" class="options" role="list" aria-labelledby="options-label"></div>
+
+    <footer class="question-footer">
+      <button id="btn-reveal" class="btn btn-plain" type="button">
+        <svg aria-hidden="true"><use href="#i-eye"/></svg><span id="btn-reveal-label">Reveal song</span>
+      </button>
+      <button id="btn-skip" class="btn btn-plain" type="button">
+        <svg aria-hidden="true"><use href="#i-forward"/></svg><span id="btn-skip-label">Skip</span>
+      </button>
+    </footer>
+  </section>
+
+  <!-- FINAL -->
+  <section id="screen-final" class="screen" aria-labelledby="final-title">
+    <div class="screen-scroll final">
+      <p class="eyebrow" id="final-title">Final Score</p>
+      <p class="final-score"><span id="final-score" data-value="0">0</span></p>
+      <p id="final-rank" class="final-rank"></p>
+
+      <div class="stats">
+        <div class="stat stat-correct"><span id="stat-correct">0</span><small>Correct</small></div>
+        <div class="stat stat-wrong"><span id="stat-wrong">0</span><small>Wrong</small></div>
+        <div class="stat stat-skipped"><span id="stat-skipped">0</span><small>Skipped</small></div>
+      </div>
+
+      <h2 class="section-label">Your songs</h2>
+      <ol id="recap" class="grouped recap"></ol>
+    </div>
+    <footer class="dock dock-stack">
+      <button id="btn-share" class="btn btn-filled btn-large" type="button">
+        <svg aria-hidden="true"><use href="#i-share"/></svg>Share Results
+      </button>
+      <button id="btn-play-again" class="btn btn-plain btn-large" type="button">Play Again</button>
+    </footer>
+  </section>
+
+  <!-- ERROR -->
+  <section id="screen-error" class="screen" aria-labelledby="error-title">
+    <div class="screen-scroll centered">
+      <h1 id="error-title" class="title-2">Something went wrong</h1>
+      <p id="error-message" class="lede">Couldn't load the game. Check your connection and try again.</p>
+    </div>
+    <footer class="dock">
+      <button id="btn-reload" class="btn btn-filled btn-large" type="button">Try Again</button>
+    </footer>
+  </section>
+
+</main>
+
+<!-- Movie info popover: grows out of the ⓘ button that opened it -->
+<div id="popover" class="popover" role="dialog" aria-labelledby="popover-title" hidden>
+  <h3 id="popover-title" class="popover-title"></h3>
+  <p id="popover-year" class="popover-year"></p>
+  <p id="popover-text" class="popover-text"></p>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- Result sheet -->
+<div id="sheet-result" class="sheet" hidden>
+  <div class="sheet-scrim"></div>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="result-title" tabindex="-1">
+    <div class="grabber" aria-hidden="true"></div>
+    <div id="result-badge" class="result-badge"><svg><use id="result-icon" href="#i-check"/></svg></div>
+    <h2 id="result-title" class="title-2">Correct</h2>
+    <p id="result-points" class="result-points"></p>
+    <div class="reveal">
+      <div class="reveal-row reveal-song-row">
+        <img id="reveal-artwork" class="reveal-artwork" alt="" width="52" height="52">
+        <div class="reveal-song-text">
+          <small>The song</small>
+          <p id="reveal-song" class="reveal-primary"></p>
+          <p id="reveal-artist" class="reveal-secondary"></p>
+        </div>
+        <a id="reveal-apple" class="apple-link" href="#" target="_blank" rel="noopener">Listen on<br>Apple&nbsp;Music</a>
+      </div>
+      <div class="reveal-row">
+        <small>Heard in</small>
+        <p id="reveal-movie" class="reveal-primary"></p>
+        <p id="reveal-also" class="reveal-also" hidden></p>
+      </div>
+    </div>
+    <button id="btn-next" class="btn btn-filled btn-large" type="button" data-autofocus>Next Song</button>
+  </div>
+</div>
+
+<!-- Quit confirmation sheet -->
+<div id="sheet-quit" class="sheet" hidden>
+  <div class="sheet-scrim"></div>
+  <div class="sheet-panel sheet-compact" role="alertdialog" aria-modal="true" aria-labelledby="quit-title" aria-describedby="quit-text" tabindex="-1">
+    <div class="grabber" aria-hidden="true"></div>
+    <h2 id="quit-title" class="title-3">End this quiz?</h2>
+    <p id="quit-text" class="lede">Your score so far won't be kept.</p>
+    <button id="btn-quit-confirm" class="btn btn-tinted-destructive btn-large" type="button">End Quiz</button>
+    <button id="btn-quit-cancel" class="btn btn-plain btn-large" type="button" data-autofocus>Keep Playing</button>
+  </div>
+</div>
+
+<!-- Version every module so a deploy can't mix fresh and cached files. Bump on each release. -->
+<script type="importmap">
+{
+  "imports": {
+    "./js/app.js": "./js/app.js?v=1",
+    "./js/data.js": "./js/data.js?v=1",
+    "./js/motion.js": "./js/motion.js?v=1",
+    "./js/player.js": "./js/player.js?v=1",
+    "./js/quiz.js": "./js/quiz.js?v=1",
+    "./js/share.js": "./js/share.js?v=1",
+    "./js/sheet.js": "./js/sheet.js?v=1",
+    "./js/ui.js": "./js/ui.js?v=1"
+  }
+}
+</script>
+<script type="module" src="js/app.js?v=1"></script>
+</body>
+</html>
